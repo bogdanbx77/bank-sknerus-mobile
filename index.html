@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank Sknerus – Mobile Prototype | by Daria Donchenko</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Space+Grotesk:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* -------------------------------------------------------------
+       PALETA KOLORÓW Z FIGMY ('palitra')
+       1. Neon Citron / Lime: #C3FF2B
+       2. Olive Gold / Card Highlight: #A8D726
+       3. Warm Gold / Ochre: #DEB841
+       4. Vibrant Orange: #F26419
+       5. Obsidian / Deep Charcoal: #121212 / #0D0E0D
+       ------------------------------------------------------------- */
+    :root {
+      --color-lime: #C3FF2B;
+      --color-lime-glow: rgba(195, 255, 43, 0.4);
+      --color-olive: #A8D726;
+      --color-gold: #DEB841;
+      --color-orange: #F26419;
+      --color-dark-bg: #0D0E0D;
+      --color-card-bg: #161816;
+      --color-card-border: rgba(255, 255, 255, 0.08);
+      --color-text-main: #FFFFFF;
+      --color-text-muted: #A0A5A0;
+      --color-text-dark: #0D0E0D;
+      --phone-width: 390px;
+      --phone-height: 844px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #080808;
+      color: var(--color-text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 30px 15px 60px;
+      overflow-x: hidden;
+    }
+
+    /* Presentation Header */
+    .showcase-header {
+      text-align: center;
+      max-width: 600px;
+      margin-bottom: 25px;
+    }
+
+    .showcase-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(195, 255, 43, 0.12);
+      border: 1px solid var(--color-lime);
+      color: var(--color-lime);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .showcase-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .showcase-title span {
+      color: var(--color-lime);
+    }
+
+    .showcase-subtitle {
+      color: var(--color-text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .controls-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .control-btn {
+      background: #1a1c1a;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .control-btn:hover {
+      background: #252825;
+      border-color: var(--color-lime);
+    }
+
+    .control-btn.active {
+      background: var(--color-lime);
+      color: #000;
+      font-weight: 700;
+      border-color: var(--color-lime);
+    }
+
+    /* -------------------------------------------------------------
+       SMARTPHONE FRAME SIMULATOR (ODDZIELNY FRAJM MOBILNY)
+       ------------------------------------------------------------- */
+    .phone-container {
+      position: relative;
+      width: var(--phone-width);
+      height: var(--phone-height);
+      background: #1e201e;
+      border-radius: 54px;
+      box-shadow: 
+        0 0 0 12px #282b28,
+        0 0 0 14px #1a1b1a,
+        0 30px 80px rgba(0, 0, 0, 0.9),
+        0 0 60px rgba(195, 255, 43, 0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Dynamic Island / Notch */
+    .phone-island {
+      position: absolute;
+      top: 13px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 30px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .island-camera {
+      width: 10px;
+      height: 10px;
+      background: #111422;
+      border-radius: 50%;
+      box-shadow: inset 0 0 2px #335;
+    }
+
+    .island-sensor {
+      width: 8px;
+      height: 8px;
+      background: #090909;
+      border-radius: 50%;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 26px;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 999;
+      color: #fff;
+      pointer-events: none;
+    }
+
+    .status-time {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* Phone Screen Scroll Viewport */
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: var(--color-dark-bg);
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      position: relative;
+      padding-top: 50px;
+      padding-bottom: 40px;
+      scrollbar-width: thin;
+      scrollbar-color: #333 transparent;
+    }
+
+    .phone-screen::-webkit-scrollbar {
+      width: 4px;
+    }
+    .phone-screen::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+    }
+
+    /* Floating Home Indicator */
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 135px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 10px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    /* -------------------------------------------------------------
+       SEKCJA 1: HERO / HEADER (Bank Sknerus by Daria Donchenko)
+       ------------------------------------------------------------- */
+    .mobile-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      background: rgba(13, 14, 13, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 500;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .brand-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .brand-logo-badge {
+      background: var(--color-lime);
+      color: #000;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .author-credit {
+      font-size: 10px;
+      color: var(--color-lime);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .menu-trigger {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #1c1e1c;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .menu-trigger:active {
+      transform: scale(0.92);
+      background: #282b28;
+    }
+
+    .menu-trigger span {
+      width: 18px;
+      height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* Marquee Banner Ticker (z Figmy 'W naszej kieszeni twoje pieniądze są bezpieczne') */
+    .ticker-wrapper {
+      background: var(--color-lime);
+      color: #000;
+      padding: 9px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .ticker-content {
+      display: inline-flex;
+      animation: tickerLoop 18s linear infinite;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .ticker-wrapper:hover .ticker-content {
+      animation-play-state: paused;
+    }
+
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 18px;
+    }
+
+    .ticker-item svg {
+      width: 14px;
+      height: 14px;
+      fill: #000;
+    }
+
+    @keyframes tickerLoop {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Hero Section Card */
+    .hero-section {
+      padding: 24px 18px 20px;
+      position: relative;
+    }
+
+    .hero-card {
+      background: linear-gradient(145deg, #181b18 0%, #101210 100%);
+      border: 1px solid rgba(195, 255, 43, 0.25);
+      border-radius: 24px;
+      padding: 26px 20px 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.5);
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, var(--color-lime-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .floating-shape {
+      position: absolute;
+      pointer-events: none;
+      animation: floatShape 4s ease-in-out infinite alternate;
+    }
+
+    .floating-star {
+      top: 15px;
+      right: 20px;
+      color: var(--color-lime);
+      font-size: 20px;
+    }
+
+    .floating-circle {
+      bottom: 60px;
+      left: 15px;
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--color-gold);
+      border-radius: 50%;
+      animation-delay: 1.5s;
+    }
+
+    @keyframes floatShape {
+      0% { transform: translateY(0) rotate(0deg); }
+      100% { transform: translateY(-10px) rotate(15deg); }
+    }
+
+    .hero-header-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-gold);
+      background: rgba(222, 184, 65, 0.12);
+      border: 1px solid rgba(222, 184, 65, 0.3);
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.8px;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+
+    .hero-title span {
+      color: var(--color-lime);
+      display: block;
+    }
+
+    .hero-desc {
+      color: var(--color-text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 22px;
+    }
+
+    /* Duck Mascot Illustration Area */
+    .duck-mascot-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0 24px;
+      position: relative;
+    }
+
+    .duck-avatar-group {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .duck-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #222622;
+      border: 3px solid var(--color-lime);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .duck-circle:hover, .duck-circle:active {
+      transform: scale(1.15) rotate(-6deg);
+    }
+
+    .duck-badge-coin {
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      background: var(--color-gold);
+      color: #000;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    /* Figma Component: 'Кнопка смотреть больше' (Nasz Blog) */
+    .btn-lime-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--color-lime);
+      color: #000;
+      text-decoration: none;
+      padding: 14px 24px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 8px 25px rgba(195, 255, 43, 0.3);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-lime-pill:hover {
+      background: #d4ff59;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(195, 255, 43, 0.45);
+    }
+
+    .btn-lime-pill:active {
+      transform: scale(0.97);
+      background: #b5f51d;
+    }
+
+    .btn-icon-beak {
+      width: 20px;
+      height: 20px;
+      fill: #000;
+    }
+
+    /* -------------------------------------------------------------
+       SEKCJA 2: O NAS (Magritte quote, Stats 100000, 7%)
+       ------------------------------------------------------------- */
+    .section-container {
+      padding: 24px 18px;
+    }
+
+    .section-tag {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--color-lime);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-tag::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--color-lime);
+      border-radius: 2px;
+    }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 18px;
+      color: #fff;
+    }
+
+    /* Magritte Philosophy Card */
+    .philosophy-card {
+      background: #141614;
+      border: 1px solid var(--color-card-border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .quote-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-gold);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .philosophy-quote {
+      font-style: italic;
+      color: #e5e8e5;
+      font-size: 13.5px;
+      line-height: 1.6;
+      border-left: 3px solid var(--color-gold);
+      padding-left: 12px;
+      margin-bottom: 12px;
+    }
+
+    .philosophy-author {
+      font-size: 12px;
+      font-weight: 700;
+      color: #8c918c;
+      text-align: right;
+    }
+
+    /* Stats Mobile Stack */
+    .stats-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: #161916;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .stat-card:hover, .stat-card:active {
+      border-color: var(--color-lime);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .stat-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      background: rgba(195, 255, 43, 0.1);
+      border: 1px solid rgba(195, 255, 43, 0.25);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .stat-card.stat-gold .stat-icon-wrapper {
+      background: rgba(222, 184, 65, 0.12);
+      border-color: rgba(222, 184, 65, 0.3);
+    }
+
+    .stat-info {
+      flex: 1;
+    }
+
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .stat-card.stat-gold .stat-value {
+      color: var(--color-lime);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    /* Portal Card Visual */
+    .portal-card {
+      background: linear-gradient(135deg, #1b2f42 0%, #0d1a24 100%);
+      border: 1px solid rgba(100, 180, 255, 0.2);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .portal-card::after {
+      content: '💸';
+      position: absolute;
+      right: 15px;
+      font-size: 40px;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+      animation: floatMoney 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatMoney {
+      0% { transform: translateY(0) rotate(-5deg); }
+      100% { transform: translateY(-8px) rotate(8deg); }
+    }
+
+    .portal-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: #cbe3ff;
+      max-width: 220px;
+    }
+
+    /* -------------------------------------------------------------
+       SEKCJA 3: CO OFERUJEMY (3 karty usługowe)
+       ------------------------------------------------------------- */
+    .offer-cards-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .offer-card {
+      background: #141714;
+      border: 1px solid var(--color-card-border);
+      border-radius: 20px;
+      padding: 22px 18px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .offer-card:hover, .offer-card:active {
+      border-color: rgba(195, 255, 43, 0.4);
+      background: #191c19;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .offer-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .offer-icon {
+      width: 44px;
+      height: 44px;
+      background: #1f231f;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .offer-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .offer-desc {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .btn-offer-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: #1b1e1b;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-offer-outline:hover, .btn-offer-outline:active {
+      background: var(--color-lime);
+      color: #000;
+      border-color: var(--color-lime);
+    }
+
+    .btn-offer-outline svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    .btn-offer-outline:hover svg {
+      transform: translateX(4px);
+    }
+
+    /* -------------------------------------------------------------
+       SEKCJA 4: INTERAKTYWNY SKARBIEC, SKNERUS TYPEWRITER, CTA & FOOTER
+       ------------------------------------------------------------- */
+    .cta-footer-section {
+      padding: 30px 18px 20px;
+      background: linear-gradient(180deg, transparent 0%, #0b0c0b 100%);
+      text-align: center;
+    }
+
+    /* Typewriter Title Animation ('SKNERUS') */
+    .typewriter-title-box {
+      margin-bottom: 20px;
+    }
+
+    .typewriter-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #fff;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .typewriter-cursor {
+      display: inline-block;
+      width: 4px;
+      height: 38px;
+      background: var(--color-lime);
+      margin-left: 6px;
+      animation: blinkCursor 0.8s infinite;
+    }
+
+    @keyframes blinkCursor {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* INTERAKTYWNY SKARBIEC (Vault Door Prototyping Transition) */
+    .vault-interactive-zone {
+      margin: 10px auto 26px;
+      max-width: 320px;
+      position: relative;
+    }
+
+    .vault-box {
+      width: 190px;
+      height: 190px;
+      margin: 0 auto;
+      background: #1a1c1a;
+      border: 6px solid #2f332f;
+      border-radius: 28px;
+      position: relative;
+      cursor: pointer;
+      perspective: 800px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.8);
+      user-select: none;
+    }
+
+    /* Drzwi Skarbca (3D Swing) */
+    .vault-door {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(145deg, #323632 0%, #1f211f 100%);
+      border-radius: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform-origin: left center;
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+      z-index: 2;
+    }
+
+    .vault-wheel {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: 5px solid var(--color-gold);
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+      transition: transform 0.6s ease;
+    }
+
+    .vault-wheel::before, .vault-wheel::after {
+      content: '';
+      position: absolute;
+      background: var(--color-gold);
+    }
+    .vault-wheel::before { width: 100%; height: 4px; }
+    .vault-wheel::after { width: 4px; height: 100%; }
+
+    .vault-handle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--color-gold);
+      z-index: 3;
+    }
+
+    /* Wnętrze Skarbca (Złote Monety) */
+    .vault-interior {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, #3d3410 0%, #13140f 100%);
+      border-radius: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .vault-treasure {
+      font-size: 44px;
+      filter: drop-shadow(0 0 12px rgba(222, 184, 65, 0.8));
+      animation: coinPulse 1.5s infinite alternate;
+    }
+
+    .vault-gold-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--color-lime);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    @keyframes coinPulse {
+      0% { transform: scale(0.95); }
+      100% { transform: scale(1.08); }
+    }
+
+    /* Stan Otwarty */
+    .vault-box.opened .vault-door {
+      transform: rotateY(-115deg);
+    }
+
+    .vault-box.opened .vault-wheel {
+      transform: rotate(270deg);
+    }
+
+    .vault-hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .vault-hint span {
+      color: var(--color-lime);
+      font-weight: 700;
+    }
+
+    /* Exact CTA Proposition Text from Section 4 */
+    .cta-proposition {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #ced3ce;
+      max-width: 320px;
+      margin: 0 auto 20px;
+    }
+
+    /* Primary CTA Button: 'Załóż konto' */
+    .btn-cta-giant {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-lime);
+      color: #000;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 900;
+      font-size: 17px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 28px;
+      border-radius: 999px;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 10px 30px var(--color-lime-glow);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-cta-giant:hover {
+      background: #d5ff5e;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(195, 255, 43, 0.5);
+    }
+
+    .btn-cta-giant:active {
+      transform: scale(0.97);
+      background: #b2f218;
+    }
+
+    /* Footer & Back-to-Top */
+    .footer-bottom {
+      margin-top: 35px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .footer-copy {
+      font-size: 11px;
+      color: #6b726b;
+    }
+
+    /* Back to top floating button (z Figmy 'Frame 11' - orange #F26419) */
+    .btn-scroll-top {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--color-orange);
+      color: #fff;
+      border: none;
+      font-size: 18px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(242, 100, 25, 0.45);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-scroll-top:hover {
+      transform: translateY(-3px) scale(1.08);
+      background: #ff752e;
+    }
+
+    .btn-scroll-top:active {
+      transform: scale(0.94);
+    }
+
+    /* Mobile Drawer Menu (Modal Overlay) */
+    .mobile-menu-drawer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 11, 10, 0.96);
+      backdrop-filter: blur(20px);
+      z-index: 2000;
+      padding: 60px 24px 30px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(-20px);
+    }
+
+    .mobile-menu-drawer.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .menu-close-btn {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #222;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .menu-links {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 30px;
+    }
+
+    .menu-link-item {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .menu-link-item:hover, .menu-link-item:active {
+      color: var(--color-lime);
+    }
+
+    /* Success Toast */
+    .toast-notification {
+      position: absolute;
+      bottom: 25px;
+      left: 20px;
+      right: 20px;
+      background: #181d18;
+      border: 1px solid var(--color-lime);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 3000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive preview controls */
+    @media (max-width: 450px) {
+      body {
+        padding: 0;
+        background: var(--color-dark-bg);
+      }
+      .showcase-header, .controls-bar {
+        display: none;
+      }
+      .phone-container {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .phone-island {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nagłówek prezentacji prototypu -->
+  <header class="showcase-header">
+    <div class="showcase-badge">Projekt Figma &bull; Wersja Mobilna (390px)</div>
+    <h1 class="showcase-title">Bank <span>Sknerus</span></h1>
+    <p class="showcase-subtitle">
+      W pełni responsywny mobilny frame z dokładnym odwzorowaniem sekcji, kolorów z palety i animacji prototypu (Smart Animate, Typewriter, Skarbiec).
+    </p>
+  </header>
+
+  <!-- Pasek sterowania -->
+  <div class="controls-bar">
+    <button class="control-btn active" id="btnModePhone">📱 Widok Smartfona (390×844)</button>
+    <button class="control-btn" id="btnOpenVaultAction">🔓 Otwórz Skarbiec</button>
+  </div>
+
+  <!-- SMARTPHONE FRAME SIMULATOR (ODDZIELNY FRAME MOBILNY) -->
+  <div class="phone-container" id="phoneDevice">
+    
+    <!-- Dynamic Island / Aparat -->
+    <div class="phone-island">
+      <div class="island-camera"></div>
+      <div class="island-sensor"></div>
+    </div>
+
+    <!-- Pasek statusu telefonu -->
+    <div class="status-bar">
+      <span class="status-time" id="liveTime">09:41</span>
+      <div class="status-icons">
+        <svg width="15" height="11" viewBox="0 0 15 11" fill="currentColor">
+          <path d="M1 9.5h2v-2H1v2zm3.5 0h2v-4h-2v4zm3.5 0h2v-6h-2v6zm3.5 0h2v-9h-2v9z"/>
+        </svg>
+        <svg width="14" height="11" viewBox="0 0 14 11" fill="currentColor">
+          <path d="M7 2a8.9 8.9 0 0 0-6 2.3l6 6.7 6-6.7A8.9 8.9 0 0 0 7 2z"/>
+        </svg>
+        <svg width="22" height="11" viewBox="0 0 22 11" fill="currentColor">
+          <rect x="0.5" y="0.5" width="18" height="10" rx="2.5" stroke="currentColor" fill="none"/>
+          <rect x="2" y="2" width="12" height="7" rx="1.5" fill="currentColor"/>
+          <path d="M20 3.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Wnętrze ekranu telefonu (Scrollowane) -->
+    <main class="phone-screen" id="phoneScrollContainer">
+
+      <!-- 1. HEADER / NAWIGACJA Z FIGMY -->
+      <nav class="mobile-nav">
+        <div class="brand-group">
+          <a href="#hero" class="brand-logo">
+            <span class="brand-logo-badge">$</span>
+            Bank Sknerus
+          </a>
+          <span class="author-credit">by Daria Donchenko</span>
+        </div>
+        <button class="menu-trigger" id="btnMenuOpen" aria-label="Otwórz menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+
+      <!-- MARQUEE TICKER BANNER ('W naszej kieszeni twoje pieniądze są bezpieczne') -->
+      <div class="ticker-wrapper" title="Zatrzymaj najeżdżając kursorem">
+        <div class="ticker-content">
+          <div class="ticker-item">
+            <span>W naszej kieszeni twoje pieniądze są bezpieczne</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2L15 8L22 9L17 14L18 21L12 17.5L6 21L7 14L2 9L9 8L12 2Z"/></svg>
+          </div>
+          <div class="ticker-item">
+            <span>W naszej kieszeni twoje pieniądze są bezpieczne</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2L15 8L22 9L17 14L18 21L12 17.5L6 21L7 14L2 9L9 8L12 2Z"/></svg>
+          </div>
+          <div class="ticker-item">
+            <span>W naszej kieszeni twoje pieniądze są bezpieczne</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2L15 8L22 9L17 14L18 21L12 17.5L6 21L7 14L2 9L9 8L12 2Z"/></svg>
+          </div>
+          <div class="ticker-item">
+            <span>W naszej kieszeni twoje pieniądze są bezpieczne</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2L15 8L22 9L17 14L18 21L12 17.5L6 21L7 14L2 9L9 8L12 2Z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEKCJA 1: HERO / GŁÓWNA -->
+      <section class="hero-section" id="hero">
+        <div class="hero-card">
+          <!-- Pływające figury geometryczne z Figmy ('фигуры') -->
+          <div class="floating-shape floating-star">✦</div>
+          <div class="floating-shape floating-circle"></div>
+
+          <span class="hero-header-badge">Oficjalny Bank Skarbca</span>
+          <h2 class="hero-title">
+            Najbezpieczniejszy <span>Skarbiec Świata</span>
+          </h2>
+          <p class="hero-desc">
+            Przechowuj majątek tak, jak legendarny Sknerus McKwacz. Gwarancja żelaznego sejfu i zerowych opłat.
+          </p>
+
+          <!-- Maskotka / Kaczor motyw -->
+          <div class="duck-mascot-container">
+            <div class="duck-avatar-group">
+              <div class="duck-circle" title="Sknerus McKwacz">
+                🦆
+                <div class="duck-badge-coin">$</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Komponent 'Кнопка смотреть больше' (Nasz Blog) z Figmy -->
+          <button class="btn-lime-pill" id="btnHeroBlog">
+            <svg class="btn-icon-beak" viewBox="0 0 24 24">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+            </svg>
+            Nasz Blog
+          </button>
+        </div>
+      </section>
+
+      <!-- SEKCJA 2: O NAS ('секция 2' z cytatem René Magritte i statystykami) -->
+      <section class="section-container" id="o-nas">
+        <div class="section-tag">Sekcja 02</div>
+        <h3 class="section-title">O NAS</h3>
+
+        <!-- Karta René Magritte z Figmy -->
+        <div class="philosophy-card">
+          <div class="quote-badge">Filozofia Marki</div>
+          <p class="philosophy-quote">
+            „Jego słynne dzieło 'To nie jest fajka' obrazuje sprzeczność między rzeczą a jej przedstawieniem. Mimo bliskich związków z paryskimi surrealistami, artysta aktywnie działał w Belgii.<br><br>
+            W swojej twórczości łączył styl akademicki z surrealistyczną wyobraźnią. Zaczynał jako modernista, leczenie w latach 40. Fascynował się malarstwem Renoira (tzw. okres słoneczny), tworzący odważne obrazy z nieoczekiwanymi zestawieniami.”
+          </p>
+          <div class="philosophy-author">René Magritte (1898–1967)</div>
+        </div>
+
+        <!-- Statystyki z klatki desktopowej przystosowane do 1-kolumny -->
+        <div class="stats-stack">
+          <!-- Stat 1: 100000 Klientów -->
+          <div class="stat-card" id="cardStatClients">
+            <div class="stat-icon-wrapper">💰</div>
+            <div class="stat-info">
+              <div class="stat-value">Ponad 100 000</div>
+              <div class="stat-label">Zaufanych Klientów &bull; 1000% Bezpieczeństwa</div>
+            </div>
+          </div>
+
+          <!-- Stat 2: Do 7% na lokacie -->
+          <div class="stat-card stat-gold" id="cardStatDeposit">
+            <div class="stat-icon-wrapper">📈</div>
+            <div class="stat-info">
+              <div class="stat-value">Nawet do 7%</div>
+              <div class="stat-label">Na lokacie terminowej ze złotym zyskiem</div>
+            </div>
+          </div>
+
+          <!-- Karta Portal ze spadającymi banknotami -->
+          <div class="portal-card">
+            <div class="portal-text">Pancerny skarbiec odporny na każdą inflację i kradzież.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEKCJA 3: CO OFERUJEMY ('секция 3' z 3 kartami z Figmy) -->
+      <section class="section-container" id="oferta">
+        <div class="section-tag">Sekcja 03</div>
+        <h3 class="section-title">Co oferujemy</h3>
+
+        <div class="offer-cards-stack">
+          <!-- Karta 1 -->
+          <div class="offer-card">
+            <div class="offer-header">
+              <div class="offer-icon">🏦</div>
+              <h4 class="offer-title">Konto Oszczędnościowe</h4>
+            </div>
+            <p class="offer-desc">
+              Wysokie oprocentowanie i pełna kontrola nad Twoimi oszczędnościami w każdej chwili.
+            </p>
+            <button class="btn-offer-outline btnOfferAction" data-product="Konto Oszczędnościowe">
+              Sprawdź ofertę
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+
+          <!-- Karta 2 -->
+          <div class="offer-card">
+            <div class="offer-header">
+              <div class="offer-icon">💎</div>
+              <h4 class="offer-title">Kredyty i Pożyczki</h4>
+            </div>
+            <p class="offer-desc">
+              Elastyczne warunki, niskie raty i szybka decyzja – zrealizuj swoje plany bez zbędnych formalności.
+            </p>
+            <button class="btn-offer-outline btnOfferAction" data-product="Kredyty i Pożyczki">
+              Sprawdź ofertę
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+
+          <!-- Karta 3 -->
+          <div class="offer-card">
+            <div class="offer-header">
+              <div class="offer-icon">📱</div>
+              <h4 class="offer-title">Bankowość Mobilna</h4>
+            </div>
+            <p class="offer-desc">
+              Zarządzaj finansami z telefonu – szybkie przelewy, płatności BLIK i pełne bezpieczeństwo 24/7.
+            </p>
+            <button class="btn-offer-outline btnOfferAction" data-product="Bankowość Mobilna">
+              Sprawdź ofertę
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEKCJA 4: TYPEWRITER SKNERUS, INTERAKTYWNY SKARBIEC, CTA & STOPKA -->
+      <section class="cta-footer-section" id="kontakt">
+        
+        <!-- Figma Frame 10: Animacja Typewriter 'SKNERUS' -->
+        <div class="typewriter-title-box">
+          <div class="typewriter-title">
+            <span id="typewriterWord">S</span>
+            <span class="typewriter-cursor"></span>
+          </div>
+        </div>
+
+        <!-- FIGMA PROTOTYPE ANIMATION: Otwierany Skarbiec (Frame 7 Smart Animate) -->
+        <div class="vault-interactive-zone">
+          <div class="vault-box" id="vaultDoorInteractive" title="Kliknij lub dotknij, aby otworzyć skarbiec!">
+            <!-- Wnętrze Skarbca -->
+            <div class="vault-interior">
+              <div class="vault-treasure">💰🪙</div>
+              <div class="vault-gold-text">Skarbiec Otwarty!</div>
+            </div>
+            <!-- Skrzydło Drzwi ze Sterem -->
+            <div class="vault-door">
+              <div class="vault-wheel">
+                <div class="vault-handle"></div>
+              </div>
+            </div>
+          </div>
+          <div class="vault-hint">
+            <span>Dotknij sejfu</span>, aby zobaczyć animację skarbca
+          </div>
+        </div>
+
+        <!-- Dokładny tekst CTA z Figmy -->
+        <p class="cta-proposition">
+          Zarządzaj swoimi oszczędnościami w bezpiecznym skarbcu. Otwarcie konta zajmuje tylko kilka minut – wybierz sprawdzone rozwiązania i zyskaj 0 zł za prowadzenie karty.
+        </p>
+
+        <!-- Przycisk Załóż Konto z Figmy ('Frame 6') -->
+        <button class="btn-cta-giant" id="btnOpenAccount">
+          Załóż konto
+        </button>
+
+        <!-- Dolna stopka i przycisk powrotu do góry ('Frame 11' pomarańczowy #F26419) -->
+        <footer class="footer-bottom">
+          <button class="btn-scroll-top" id="btnScrollTop" title="Wróć na górę">
+            ↑
+          </button>
+          <div class="footer-copy">
+            &copy; 2026 Bank Sknerus. Wszelkie prawa zastrzeżone.<br>
+            Design by Daria Donchenko &bull; Mobile Prototype
+          </div>
+        </footer>
+
+      </section>
+
+      <!-- MENU MOBILNE DRAWER -->
+      <div class="mobile-menu-drawer" id="mobileDrawer">
+        <button class="menu-close-btn" id="btnMenuClose">&times;</button>
+        <div class="brand-group" style="margin-bottom: 20px;">
+          <div class="brand-logo">Bank Sknerus</div>
+          <span class="author-credit">Menu nawigacji</span>
+        </div>
+        <div class="menu-links">
+          <a href="#hero" class="menu-link-item drawer-nav-link">Główna</a>
+          <a href="#o-nas" class="menu-link-item drawer-nav-link">O nas</a>
+          <a href="#oferta" class="menu-link-item drawer-nav-link">Co oferujemy</a>
+          <a href="#kontakt" class="menu-link-item drawer-nav-link">Otwórz Skarbiec / Kontakt</a>
+        </div>
+        <div style="margin-top: auto; padding-top: 20px;">
+          <button class="btn-lime-pill drawer-nav-link" id="btnMenuCta" style="width: 100%;">
+            Załóż konto (0 zł)
+          </button>
+        </div>
+      </div>
+
+      <!-- Toast Powiadomienia -->
+      <div class="toast-notification" id="toastMessage">
+        <span>✨</span>
+        <span id="toastText">Konto zostało wybrane!</span>
+      </div>
+
+    </main>
+
+    <!-- Pasek domowy iOS na dole telefonu -->
+    <div class="home-indicator"></div>
+  </div>
+
+  <script>
+    // -------------------------------------------------------------
+    // ZEGAR W PASKU STATUSU TELEFONU
+    // -------------------------------------------------------------
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const liveTimeEl = document.getElementById('liveTime');
+      if (liveTimeEl) liveTimeEl.textContent = `${hours}:${minutes}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // -------------------------------------------------------------
+    // 1. ANIMACJA TYPEWRITER 'SKNERUS' (Z FIGMY 'Frame 10' After Delay)
+    // -------------------------------------------------------------
+    const wordTarget = "SKNERUS";
+    const typewriterEl = document.getElementById('typewriterWord');
+    let currentIndex = 1;
+    let isDeleting = false;
+
+    function runTypewriter() {
+      if (!isDeleting) {
+        currentIndex++;
+        typewriterEl.textContent = wordTarget.substring(0, currentIndex);
+        if (currentIndex === wordTarget.length) {
+          isDeleting = true;
+          setTimeout(runTypewriter, 2200); // pauza przy pełnym napisie
+          return;
+        }
+      } else {
+        currentIndex--;
+        typewriterEl.textContent = wordTarget.substring(0, Math.max(1, currentIndex));
+        if (currentIndex <= 1) {
+          isDeleting = false;
+          setTimeout(runTypewriter, 600);
+          return;
+        }
+      }
+      const delay = isDeleting ? 120 : 220;
+      setTimeout(runTypewriter, delay);
+    }
+    setTimeout(runTypewriter, 800);
+
+    // -------------------------------------------------------------
+    // 2. INTERAKTYWNA ANIMACJA DRZWI SKARBCA (Z FIGMY 'Frame 7' Smart Animate)
+    // -------------------------------------------------------------
+    const vault = document.getElementById('vaultDoorInteractive');
+    const btnOpenVault = document.getElementById('btnOpenVaultAction');
+
+    function toggleVault() {
+      vault.classList.toggle('opened');
+      const isOpened = vault.classList.contains('opened');
+      if (isOpened) {
+        showToast("🔓 Skarbiec otwarty! Odkryto złote monety Sknerusa!");
+        if (btnOpenVault) btnOpenVault.textContent = "🔒 Zamknij Skarbiec";
+      } else {
+        showToast("🔒 Skarbiec został bezpiecznie zaryglowany.");
+        if (btnOpenVault) btnOpenVault.textContent = "🔓 Otwórz Skarbiec";
+      }
+    }
+
+    if (vault) vault.addEventListener('click', toggleVault);
+    if (btnOpenVault) btnOpenVault.addEventListener('click', toggleVault);
+
+    // -------------------------------------------------------------
+    // 3. OBSŁUGA MENU MOBILNEGO
+    // -------------------------------------------------------------
+    const drawer = document.getElementById('mobileDrawer');
+    const btnMenuOpen = document.getElementById('btnMenuOpen');
+    const btnMenuClose = document.getElementById('btnMenuClose');
+    const drawerLinks = document.querySelectorAll('.drawer-nav-link');
+
+    btnMenuOpen.addEventListener('click', () => drawer.classList.add('active'));
+    btnMenuClose.addEventListener('click', () => drawer.classList.remove('active'));
+
+    drawerLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        drawer.classList.remove('active');
+      });
+    });
+
+    // -------------------------------------------------------------
+    // 4. PRZYCISK POWROTU DO GÓRY ('Frame 11' Orange #F26419)
+    // -------------------------------------------------------------
+    const btnScrollTop = document.getElementById('btnScrollTop');
+    const phoneScreen = document.getElementById('phoneScrollContainer');
+
+    btnScrollTop.addEventListener('click', () => {
+      phoneScreen.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // -------------------------------------------------------------
+    // 5. OBSŁUGA AKCJI I POWIADOMIEŃ TOAST
+    // -------------------------------------------------------------
+    const toast = document.getElementById('toastMessage');
+    const toastText = document.getElementById('toastText');
+    let toastTimer;
+
+    function showToast(msg) {
+      clearTimeout(toastTimer);
+      toastText.textContent = msg;
+      toast.classList.add('show');
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3500);
+    }
+
+    // Obsługa przycisków ofert
+    document.querySelectorAll('.btnOfferAction').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const prod = btn.getAttribute('data-product');
+        showToast(`Wybrano ofertę: ${prod}. Przygotowujemy szczegóły...`);
+      });
+    });
+
+    // Obsługa CTA Załóż konto
+    document.getElementById('btnOpenAccount').addEventListener('click', () => {
+      showToast("🚀 Przekierowanie do formularza otwarcia konta 0 zł...");
+      if (!vault.classList.contains('opened')) {
+        setTimeout(toggleVault, 500);
+      }
+    });
+
+    // Blog
+    document.getElementById('btnHeroBlog').addEventListener('click', () => {
+      showToast("📖 Otwieranie bloga finansowego Banku Sknerus...");
+    });
+
+    // -------------------------------------------------------------
+    // 6. PRZEŁĄCZNIK WIDOKU TELEFONU
+    // -------------------------------------------------------------
+    const btnModePhone = document.getElementById('btnModePhone');
+    const phoneDevice = document.getElementById('phoneDevice');
+    let isFullMobile = false;
+
+    btnModePhone.addEventListener('click', () => {
+      isFullMobile = !isFullMobile;
+      if (isFullMobile) {
+        phoneDevice.style.width = '428px';
+        phoneDevice.style.height = '926px';
+        btnModePhone.textContent = '📱 Widok Max (428×926)';
+        showToast("Zmieniono rozmiar na iPhone 15/16 Pro Max");
+      } else {
+        phoneDevice.style.width = '390px';
+        phoneDevice.style.height = '844px';
+        btnModePhone.textContent = '📱 Widok Smartfona (390×844)';
+        showToast("Zmieniono rozmiar na standardowy 390×844");
+      }
+    });
+  </script>
+</body>
+</html>
